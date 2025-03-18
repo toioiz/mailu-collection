@@ -1,0 +1,33 @@
+- name: Ensure domains exist
+  block:
+    - name: Check if domain exists
+      uri:
+        url: "{{ mailu_api_url }}/domain/{{ item.name }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ mailu_api_key }}"
+        status_code: 200
+      register: domain_check
+      failed_when: domain_check.status not in [200, 404]
+      with_items: "{{ mailu_domains }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Create domain if it does not exist
+      uri:
+        url: "{{ mailu_api_url }}/domain"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ mailu_api_key }}"
+          Content-Type: "application/json"
+        body: >
+          {{
+            {
+              "name": item.name
+            } | to_json
+          }}
+        status_code: 201
+      when: domain_check.results[loop.index0].status == 404
+      with_items: "{{ mailu_domains }}"
+      loop_control:
+        label: "{{ item.name }}"

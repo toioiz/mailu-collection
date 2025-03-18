@@ -1,0 +1,35 @@
+- name: Ensure users exist
+  block:
+    - name: Check if user exists
+      uri:
+        url: "{{ mailu_api_url }}/user/{{ item.email }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ mailu_api_key }}"
+        status_code: 200
+      register: user_check
+      failed_when: user_check.status not in [200, 404]
+      with_items: "{{ mailu_users }}"
+      loop_control:
+        label: "{{ item.email }}"
+
+    - name: Create user if it does not exist
+      uri:
+        url: "{{ mailu_api_url }}/user"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ mailu_api_key }}"
+          Content-Type: "application/json"
+        body: >
+          {{
+            {
+              "email": item.email,
+              "password": item.password,
+              "quota": item.quota
+            } | to_json
+          }}
+        status_code: 201
+      when: user_check.results[loop.index0].status == 404
+      with_items: "{{ mailu_users }}"
+      loop_control:
+        label: "{{ item.email }}"

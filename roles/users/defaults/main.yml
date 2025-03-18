@@ -1,0 +1,3 @@
+mailu_api_url: "http://mailu.example.com/api"
+mailu_api_key: "your_api_key"
+mailu_users: ""
