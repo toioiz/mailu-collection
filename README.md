@@ -1,5 +1,7 @@
 ### README for `mailu-collection`
 
+## NON-FUNCTIONAL AT THIS TIME
+
 #### Overview
 The `mailu-collection` is an Ansible collection designed to manage a Mailu instance via its REST API. It provides roles to configure users, domains, aliases, and alternatives in an idempotent manner. Each role ensures that the specified resources exist, creating them if they do not.
 
